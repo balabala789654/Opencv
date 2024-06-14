@@ -104,3 +104,4 @@ plane1 = plane("plane1")
 boot1 = boot("boot1")
 for x in [car1, plane1, boot1]:
     x.move()
+
