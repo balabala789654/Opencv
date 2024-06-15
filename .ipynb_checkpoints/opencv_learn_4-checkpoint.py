@@ -13,20 +13,12 @@ img = cv2.imread(img_path)
 img = cv2.resize(img, (640,480))
 cv2.namedWindow("img", cv2.WINDOW_NORMAL)
 
-# 创建滑动条做调色板
 cv2.createTrackbar("r", "img", 0, 255, nothing)
-cv2.createTrackbar("g", "img", 0, 255, nothing)
-cv2.createTrackbar("b", "img", 0, 255, nothing)
 
 print(img[480-1][640-1], type(img), type(img[480-1][640-1][0]))
 while True:
     r = cv2.getTrackbarPos("r", "img")
-    g = cv2.getTrackbarPos("g", "img")
-    b = cv2.getTrackbarPos("b", "img")
-
-    # tip: 在opencv python中图像的img[:,:,2]为红色分量，img[:,:,1]为绿色分量，img[:,:,0]为蓝色分量 
-    img[:, :] = [b,g,r] 
-
+    img[50:100, 50:100] = [r]
     cv2.imshow("img",img)
     # print(img[x][y][0], type(img), type(img[x][y][0]))
     
