@@ -8,7 +8,7 @@ import numpy as np
 OpenCV 函数：cv2.contourArea(), cv2.arcLength(), cv2.approxPolyDP() 等
 '''
 
-path = "./learn/pic/number.jpg"
+path = "./learn/pic/number.png"
 img = cv2.imread(path)
 img = cv2.resize(img, (640, 480))
 img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)

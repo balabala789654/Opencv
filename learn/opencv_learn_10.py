@@ -16,7 +16,7 @@ def nothing(X):
     pass
 
 
-path = "./pic/3.jpg"
+path = "./learn/pic/3.jpg"
 img = cv2.imread(path)
 img = cv2.resize(img, (640,480))
 
