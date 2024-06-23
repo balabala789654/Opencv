@@ -1,4 +1,5 @@
 # 车道检测实战项目
+[参考文档](https://codec.wang/docs/opencv/basic/challenge-03-lane-road-detection)
 ## 介绍
 ### 图像预处理
 > 由于我们使用的是**统计概率霍夫直线变换**然而霍夫直线变换需要输入经过边缘检测后的图像，因此预处理的主要操作是将图像变换成边缘检测图像
