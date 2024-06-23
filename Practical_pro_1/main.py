@@ -27,10 +27,21 @@ def plt_show(x):
 def img_to_rgb(x):
     return cv2.cvtColor(x, cv2.COLOR_GRAY2BGR)
 
-path = os.getcwd()
-path = os.path.join(path, "Practical_pro_1/pic/lane.jpg")
-if __name__ == "__main__":
-    
+def fit_output(_points, ymax, ymin):
+    x_fit = [p[0] for p in _points]
+    y_fit = [p[1] for p in _points]
+
+    fit = np.polyfit(y_fit,x_fit,1)
+    fit_fn = np.poly1d(fit)
+    # print(type(fit), fit, type(fit_fn),fit_fn)
+    xmin = int(fit_fn(ymin))
+    xmax = int(fit_fn(ymax))
+
+    return [(xmin, ymin), (xmax, ymax)]
+
+
+def image_process():
+    global img, img_th
     img = cv2.imread(path)
     cv2.namedWindow("img", cv2.WINDOW_NORMAL)
     cv2.namedWindow("img_1", cv2.WINDOW_NORMAL)
@@ -46,10 +57,18 @@ if __name__ == "__main__":
     ret, img_th = cv2.threshold(img_gray, 160, 255, cv2.THRESH_BINARY)
     img_bit_add = cv2.bitwise_and(img_th,img_th,mask=mask_img)
     img_edge = cv2.Canny(img_bit_add, 200, 255)
+    return img_edge
+
+path = os.getcwd()
+path = os.path.join(path, "Practical_pro_1/pic/lane2.jpg")
+if __name__ == "__main__":
+    
+    img_edge = image_process()
+
     lines = cv2.HoughLinesP(img_edge, 1, np.pi / 180, 15, minLineLength=10, maxLineGap=10)    
     print(len(lines), lines)
     img_color = img_to_rgb(img_edge)
-    print(points)
+
     # creat_track_th()
     # creat_track_canny()
 
@@ -62,20 +81,38 @@ if __name__ == "__main__":
             slope = (y2-y1)/(x2-x1)
             print(x1, y1, x2, y2, slope)
             cv2.line(img_color, (x1, y1), (x2, y2), (0, 255, 0), 2)    
-            cv2.circle(img_color, center=(x1, y1), radius=5, color=(255,0,0), thickness=-1)
-            cv2.circle(img_color, center=(x2, y2), radius=5, color=(0,0,255), thickness=-1)
+            cv2.circle(img_color, center=(x1, y1), radius=2, color=(255,0,0), thickness=-1)
+            cv2.circle(img_color, center=(x2, y2), radius=2, color=(0,0,255), thickness=-1)
             if slope < 0:
-                left_lines.append(slope)
+                left_lines.append(line)
             else:
-                right_lines.append(slope)
+                right_lines.append(line)
 
-    for i in range(len(right_lines)):
-        average_slope += right_lines[i]
+    # for i in range(len(right_lines)):
+    #     average_slope += right_lines[i]
 
-    average_slope = average_slope/len(right_lines)
+    # average_slope = average_slope/len(right_lines)
 
-    print(len(right_lines), right_lines, average_slope)
+    # print(len(right_lines), right_lines, average_slope)
+    print(left_lines, "\n")
+    left_points = [(x1,y1) for line in left_lines for x1, y1, x2, y2 in line]
+    left_points = left_points + [(x2, y2) for line in left_lines for x1, y1, x2, y2 in line]
 
+    right_points = [(x1, y1) for line in right_lines for x1, y1, x2, y2 in line]
+    right_points = right_points + [(x2, y2) for line in right_lines for x1, y1, x2, y2 in line]
+
+    print(type(left_lines), left_points)
+
+    point_left_fit_1, point_left_fit_2 = fit_output(left_points, img.shape[0], 340)
+    point_right_fit_1, point_right_fit_2 = fit_output(right_points, img.shape[0], 340)
+
+    cv2.line(img, pt1=point_left_fit_1, pt2=point_left_fit_2, color=[255, 0, 255], thickness=4)
+    cv2.line(img, pt1=point_right_fit_1, pt2=point_right_fit_2, color=[255, 0, 255], thickness=4)
+
+    img_black_1 = np.zeros((img.shape[0], img.shape[1]), dtype=np.uint8)
+    img_black_color = img_to_rgb(img_black_1)
+    cv2.fillPoly(img_black_color, [np.array([point_left_fit_1, point_right_fit_1, point_right_fit_2, point_left_fit_2])], color=[255, 255, 0])
+    img_optput = cv2.addWeighted(src1=img, alpha=0.5, src2=img_black_color, beta=0.5, gamma=0)
     while True:
         # num = cv2.getTrackbarPos("th", "img")
         # maxval = cv2.getTrackbarPos("maxval", "img_2")
@@ -86,9 +123,10 @@ if __name__ == "__main__":
 
         # cv2.drawContours(img_color, con, -1, [0, 0, 255], 2)
 
+
         cv2.imshow("img", img_th)
-        cv2.imshow("img_1", mask_img)
-        cv2.imshow("img_2", img_color)
+        cv2.imshow("img_1", img_color)
+        cv2.imshow("img_2", img_optput)
 
         k = cv2.waitKey(1)
         if k == ord('q'):
