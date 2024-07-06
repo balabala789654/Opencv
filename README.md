@@ -9,6 +9,10 @@ conda activate <your path>
 
 conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
 
+conda config --remove channels <your channel>
+
+conda config --show channels
+
 conda config --append channels conda-forge
 
 deactivate
